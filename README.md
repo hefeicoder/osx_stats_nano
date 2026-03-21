@@ -1,4 +1,4 @@
-# OSX Stats Nano <img src="icon.png" width="64" align="right">
+# OSX Stats Nano <img src="icon.png" width="48">
 
 The world's lightest macOS menu bar system monitor. Pure AppKit, zero dependencies, ~800 lines of Swift.
 

@@ -64,22 +64,32 @@ final class StatusBarView: NSView {
     func rebuildWidgets() {
         var widgets: [StatusBarWidget] = []
         if appConfig.showNetwork {
-            widgets.append(TextWidget(
-                "↓\(snapshot.network.formattedIn) ↑\(snapshot.network.formattedOut)",
-                sizedFor: "↓999 MB/s ↑999 MB/s"
-            ))
+            widgets.append(NetworkWidget(down: snapshot.network.formattedIn,
+                                         up: snapshot.network.formattedOut))
         }
         if appConfig.showCPU {
-            widgets.append(PercentageCircleWidget(icon: cpuIcon, percentage: snapshot.cpu, tintColor: .systemGreen))
+            widgets.append(makeWidget(style: appConfig.cpuStyle, icon: cpuIcon,
+                                      percentage: snapshot.cpu, color: appConfig.cpuColor))
         }
         if appConfig.showMemory {
-            widgets.append(PercentageCircleWidget(icon: memIcon, percentage: snapshot.memory.percentage, tintColor: .systemOrange))
+            widgets.append(makeWidget(style: appConfig.memoryStyle, icon: memIcon,
+                                      percentage: snapshot.memory.percentage, color: appConfig.memoryColor))
         }
         if appConfig.showGPU && snapshot.gpu >= 0 {
-            widgets.append(PercentageCircleWidget(icon: gpuIcon, percentage: snapshot.gpu, tintColor: .systemPurple))
+            widgets.append(makeWidget(style: appConfig.gpuStyle, icon: gpuIcon,
+                                      percentage: snapshot.gpu, color: appConfig.gpuColor))
         }
         cachedWidgets = widgets
         cachedWidth = widgets.isEmpty ? 0 : widgets.reduce(0) { $0 + $1.widthForHeight(22) + spacing } - spacing
+    }
+
+    private func makeWidget(style: String, icon: NSImage?, percentage: Double, color: String) -> StatusBarWidget {
+        let tint = AppConfig.color(for: color)
+        switch style {
+        case "bar":  return PercentageBarWidget(icon: icon, percentage: percentage, tintColor: tint)
+        case "vbar": return VerticalBarWidget(icon: icon, percentage: percentage, tintColor: tint)
+        default:     return PercentageCircleWidget(icon: icon, percentage: percentage, tintColor: tint)
+        }
     }
 
     override func draw(_ dirtyRect: NSRect) {

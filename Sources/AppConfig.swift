@@ -1,4 +1,5 @@
 import Foundation
+import AppKit
 
 /// App configuration loaded from ~/.config/osx-stats-nano/config.yaml
 /// Hand-rolled flat YAML parser — no external dependency.
@@ -12,11 +13,34 @@ struct AppConfig {
     var showGPU: Bool = true
     var showNetwork: Bool = true
 
+    // Widget style: circle | bar | vbar
+    var cpuStyle: String = "circle"
+    var memoryStyle: String = "circle"
+    var gpuStyle: String = "circle"
+
+    // Widget colors: green | orange | blue | red | purple | yellow | pink | teal
+    var cpuColor: String = "green"
+    var memoryColor: String = "orange"
+    var gpuColor: String = "purple"
+
     // SF Symbol names — see developer.apple.com/sf-symbols
     var cpuIcon: String = "cpu"
     var memoryIcon: String = "memorychip"
     var gpuIcon: String = "display"
     var networkIcon: String = "network"
+
+    static func color(for name: String) -> NSColor {
+        switch name {
+        case "orange": return .systemOrange
+        case "blue":   return .systemBlue
+        case "red":    return .systemRed
+        case "purple": return .systemPurple
+        case "yellow": return .systemYellow
+        case "pink":   return .systemPink
+        case "teal":   return .systemTeal
+        default:       return .systemGreen
+        }
+    }
 
     static let configDir = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent(".config/osx-stats-nano")
@@ -71,6 +95,18 @@ struct AppConfig {
                 if !rawValue.isEmpty { config.gpuIcon = rawValue }
             case "network_icon":
                 if !rawValue.isEmpty { config.networkIcon = rawValue }
+            case "cpu_style":
+                if !rawValue.isEmpty { config.cpuStyle = rawValue.lowercased() }
+            case "memory_style":
+                if !rawValue.isEmpty { config.memoryStyle = rawValue.lowercased() }
+            case "gpu_style":
+                if !rawValue.isEmpty { config.gpuStyle = rawValue.lowercased() }
+            case "cpu_color":
+                if !rawValue.isEmpty { config.cpuColor = rawValue.lowercased() }
+            case "memory_color":
+                if !rawValue.isEmpty { config.memoryColor = rawValue.lowercased() }
+            case "gpu_color":
+                if !rawValue.isEmpty { config.gpuColor = rawValue.lowercased() }
             default:
                 break
             }
@@ -87,28 +123,48 @@ struct AppConfig {
         try? fm.createDirectory(at: configDir, withIntermediateDirectories: true)
 
         let defaultYAML = """
-        # OSX Stats Nano Configuration
-        #
-        # Intervals: seconds between polls per monitor (min 0.5, gpu min 1.0)
-        # GPU uses IOKit which is heavier — default 6s is recommended.
-        # show_*: toggle each monitor on/off
-        #
-        # Icons: SF Symbol names — browse at developer.apple.com/sf-symbols
-        # Some options:
-        #   cpu:        cpu, cpu.fill, bolt, bolt.fill
-        #   memory:     memorychip, memorychip.fill
-        #   gpu:        display, display.fill, rectangle.3.group
-        #   network:    network, wifi, antenna.radiowaves.left.and.right
+        # ─────────────────────────────────────────
+        # OSX Stats Nano — Configuration
+        # ─────────────────────────────────────────
+        # Edit this file and restart the app to apply changes.
 
-        cpu_interval: 2.0      # default: 2s
-        memory_interval: 2.0   # default: 2s
-        gpu_interval: 6.0      # default: 6s (IOKit is heavier)
-        network_interval: 2.0  # default: 2s
+        # ── Polling intervals (seconds) ──────────
+        # Minimum: 0.5s (gpu minimum: 1.0s)
+        # GPU uses IOKit which is heavier — 6s recommended.
 
-        show_cpu: true
-        show_memory: true
-        show_gpu: true
-        show_network: true
+        cpu_interval: 2.0      # default: 2.0
+        memory_interval: 2.0   # default: 2.0
+        gpu_interval: 6.0      # default: 6.0
+        network_interval: 2.0  # default: 2.0
+
+        # ── Visibility ───────────────────────────
+        # Options: true | false
+
+        show_cpu: true         # default: true
+        show_memory: true      # default: true
+        show_gpu: true         # default: true
+        show_network: true     # default: true
+
+        # ── Widget style ─────────────────────────
+        # Options: circle | bar | vbar
+
+        cpu_style: circle      # default: circle
+        memory_style: circle   # default: circle
+        gpu_style: circle      # default: circle
+
+        # ── Widget color ─────────────────────────
+        # Options: green | orange | blue | red | purple | yellow | pink | teal
+
+        cpu_color: green       # default: green
+        memory_color: orange   # default: orange
+        gpu_color: purple      # default: purple
+
+        # ── Icons (SF Symbol names) ───────────────
+        # Browse symbols at: developer.apple.com/sf-symbols
+        # cpu:     cpu | cpu.fill | bolt | bolt.fill
+        # memory:  memorychip | memorychip.fill
+        # gpu:     display | display.fill | rectangle.3.group
+        # network: network | wifi | antenna.radiowaves.left.and.right
 
         cpu_icon: cpu
         memory_icon: memorychip

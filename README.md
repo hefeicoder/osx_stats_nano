@@ -5,6 +5,7 @@ The world's lightest macOS menu bar system monitor. Pure AppKit, zero dependenci
 ![macOS 13+](https://img.shields.io/badge/macOS-13%2B-blue)
 ![Swift 5.9](https://img.shields.io/badge/Swift-5.9-orange)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green)
+[![Download](https://img.shields.io/github/v/release/hefeicoder/osx_stats_nano?label=download&color=blue)](https://github.com/hefeicoder/osx_stats_nano/releases/latest)
 
 ## What it does
 
@@ -29,7 +30,15 @@ Most menu bar monitors pull in SwiftUI, Combine, or third-party charting librari
 - **Per-monitor polling** — each metric has its own configurable interval
 - **~10 MB RSS** target (vs 15–20 MB for SwiftUI-based alternatives)
 
-## Install & Run
+## Install
+
+**Download (recommended):**
+
+1. Download `OSXStatsNano-x.x.x.dmg` from [Releases](https://github.com/hefeicoder/osx_stats_nano/releases/latest)
+2. Open the DMG and drag **OSXStatsNano** into Applications
+3. On first launch, right-click → Open to bypass Gatekeeper (ad-hoc signed)
+
+**Build from source:**
 
 ```bash
 git clone https://github.com/hefeicoder/osx_stats_nano.git
@@ -37,14 +46,7 @@ cd osx_stats_nano
 ./run.sh
 ```
 
-Or build manually:
-
-```bash
-swift build -c release
-.build/release/OSXStatsNano
-```
-
-Requires **macOS 13+** and **Xcode** (or Xcode Command Line Tools with full Xcode for tests).
+Requires **macOS 13+** and **Xcode**.
 
 ## Configuration
 

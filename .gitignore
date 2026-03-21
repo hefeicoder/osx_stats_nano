@@ -4,5 +4,6 @@
 xcuserdata/
 DerivedData/
 .DS_Store
-docs/
+docs/plans/
+.claude/
 .claude/

@@ -10,12 +10,14 @@ The world's lightest macOS menu bar system monitor. Pure AppKit, zero dependenci
 
 Displays live **CPU**, **Memory**, **GPU**, and **Network** stats in your menu bar with minimal resource usage.
 
-- **CPU** — horizontal bar graph (green)
+![OSX Stats Nano preview](docs/screenshots/preview.png)
+
+- **CPU** — ring gauge (green)
 - **Memory** — ring gauge (orange)
 - **GPU** — ring gauge (purple, hidden if unavailable)
 - **Network** — ↓/↑ throughput text
 
-Click the menu bar item for a detailed breakdown.
+Click the menu bar item for a detailed breakdown with core counts and live-updating values.
 
 ## Why another stats app?
 

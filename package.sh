@@ -3,7 +3,7 @@ set -e
 
 APP_NAME="OSXStatsNano"
 BUNDLE_ID="com.hefeicoder.osx-stats-nano"
-VERSION="1.0.1"
+VERSION="1.0.2"
 APP_BUNDLE="${APP_NAME}.app"
 DMG_NAME="${APP_NAME}-${VERSION}.dmg"
 BUILD_DIR=".build/release"

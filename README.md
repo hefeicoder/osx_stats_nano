@@ -36,7 +36,9 @@ Most menu bar monitors pull in SwiftUI, Combine, or third-party charting librari
 
 1. Download `OSXStatsNano-x.x.x.dmg` from [Releases](https://github.com/hefeicoder/osx_stats_nano/releases/latest)
 2. Open the DMG and drag **OSXStatsNano** into Applications
-3. On first launch, right-click → Open to bypass Gatekeeper (ad-hoc signed)
+3. **First launch:** macOS will block the app since it is not notarized. To open it:
+   - Right-click `OSXStatsNano.app` → **Open** → **Open** in the dialog, or
+   - Run in Terminal: `xattr -d com.apple.quarantine /Applications/OSXStatsNano.app`
 
 **Build from source:**
 

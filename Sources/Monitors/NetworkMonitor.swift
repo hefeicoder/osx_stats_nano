@@ -14,7 +14,10 @@ struct NetworkThroughput {
             return String(format: "%.0f KB/s", kb)
         }
         let mb = kb / 1024
-        return String(format: "%.1f MB/s", mb)
+        if mb < 1024 {
+            return String(format: "%.1f MB/s", mb)
+        }
+        return String(format: "%.1f GB/s", mb / 1024)
     }
 }
 

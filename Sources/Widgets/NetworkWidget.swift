@@ -12,7 +12,7 @@ struct NetworkWidget: StatusBarWidget {
     private let rowGap: CGFloat = 1
     private let fixedWidth: CGFloat
 
-    private static let maxTemplate = "999 MB/s"
+    private static let maxTemplate = "1023 KB/s"
 
     init(down: String, up: String) {
         self.downText = down

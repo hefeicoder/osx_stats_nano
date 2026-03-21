@@ -1,4 +1,6 @@
 .build/
+*.app
+*.dmg
 .swiftpm/
 *.xcodeproj
 xcuserdata/

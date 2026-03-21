@@ -1,6 +1,7 @@
 .build/
 *.app
 *.dmg
+*.icns
 .swiftpm/
 *.xcodeproj
 xcuserdata/

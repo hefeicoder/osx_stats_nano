@@ -4,6 +4,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusBarController: StatusBarController!
     private var poller: StatsPoller!
     private var menu: NSMenu!
+    private var menuBuilder: StatsMenuBuilder!
+    private var menuIsOpen = false
 
     private var config = AppConfig()
 
@@ -13,16 +15,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         statusBarController = StatusBarController(config: config)
 
-        // Create menu shell once — contents built lazily in menuWillOpen
+        menuBuilder = StatsMenuBuilder(config: config)
         menu = NSMenu()
         menu.delegate = self
+        menu.autoenablesItems = false
+
+        // Build menu structure once (items are reused, values updated live)
+        menuBuilder.buildMenu(menu)
+
+        let quitItem = NSMenuItem(title: "Quit", action: #selector(quit), keyEquivalent: "q")
+        quitItem.target = self
+        menu.addItem(quitItem)
+
         statusBarController.setMenu(menu)
 
         poller = StatsPoller(config: config)
         poller.onUpdate = { [weak self] snapshot in
-            // Already on main thread (dispatched by StatsPoller)
-            self?.statusBarController.display(snapshot)
-            // Menu NOT rebuilt here — only on click via menuWillOpen
+            guard let self else { return }
+            self.statusBarController.display(snapshot)
+            // Update menu item values live while menu is open
+            if self.menuIsOpen {
+                self.menuBuilder.update(snapshot: snapshot)
+            }
         }
         poller.start()
     }
@@ -31,24 +45,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         poller.stop()
     }
 
-    // MARK: - NSMenuDelegate — lazy menu building (only on user click)
+    // MARK: - NSMenuDelegate
 
     func menuWillOpen(_ menu: NSMenu) {
-        menu.removeAllItems()
+        menuIsOpen = true
+        // Refresh values immediately on open
+        menuBuilder.update(snapshot: statusBarController.snapshot)
+    }
 
-        let snapshot = statusBarController.snapshot
-
-        // Pure AppKit view — no SwiftUI, no NSHostingView
-        let detailItem = NSMenuItem()
-        let detailView = StatsDetailView(snapshot: snapshot)
-        detailItem.view = detailView
-        menu.addItem(detailItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        let quitItem = NSMenuItem(title: "Quit", action: #selector(quit), keyEquivalent: "q")
-        quitItem.target = self
-        menu.addItem(quitItem)
+    func menuDidClose(_ menu: NSMenu) {
+        menuIsOpen = false
     }
 
     @objc private func quit() {

@@ -12,6 +12,12 @@ struct AppConfig {
     var showGPU: Bool = true
     var showNetwork: Bool = true
 
+    // SF Symbol names — see developer.apple.com/sf-symbols
+    var cpuIcon: String = "cpu"
+    var memoryIcon: String = "memorychip"
+    var gpuIcon: String = "display"
+    var networkIcon: String = "network"
+
     static let configDir = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent(".config/osx-stats-nano")
     static let configPath = configDir.appendingPathComponent("config.yaml")
@@ -27,34 +33,44 @@ struct AppConfig {
 
         for line in text.split(separator: "\n", omittingEmptySubsequences: false) {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
-            // Skip comments and empty lines
-            if trimmed.isEmpty || trimmed.hasPrefix("#") { continue }
+            // Strip inline comments and skip empty/comment lines
+            let stripped = trimmed.hasPrefix("#") ? "" : String(trimmed.prefix(while: { $0 != "#" }))
+                .trimmingCharacters(in: .whitespaces)
+            if stripped.isEmpty { continue }
 
-            guard let colonIndex = trimmed.firstIndex(of: ":") else { continue }
-            let key = trimmed[trimmed.startIndex..<colonIndex]
+            guard let colonIndex = stripped.firstIndex(of: ":") else { continue }
+            let key = stripped[stripped.startIndex..<colonIndex]
                 .trimmingCharacters(in: .whitespaces)
                 .lowercased()
-            let value = trimmed[trimmed.index(after: colonIndex)...]
+            // Preserve case for icon values (SF Symbol names are case-sensitive)
+            let rawValue = stripped[stripped.index(after: colonIndex)...]
                 .trimmingCharacters(in: .whitespaces)
-                .lowercased()
 
             switch key {
             case "cpu_interval":
-                if let v = Double(value), v >= 0.5 { config.cpuInterval = v }
+                if let v = Double(rawValue), v >= 0.5 { config.cpuInterval = v }
             case "memory_interval":
-                if let v = Double(value), v >= 0.5 { config.memoryInterval = v }
+                if let v = Double(rawValue), v >= 0.5 { config.memoryInterval = v }
             case "gpu_interval":
-                if let v = Double(value), v >= 1.0 { config.gpuInterval = v }
+                if let v = Double(rawValue), v >= 1.0 { config.gpuInterval = v }
             case "network_interval":
-                if let v = Double(value), v >= 0.5 { config.networkInterval = v }
+                if let v = Double(rawValue), v >= 0.5 { config.networkInterval = v }
             case "show_cpu":
-                config.showCPU = value == "true"
+                config.showCPU = rawValue.lowercased() == "true"
             case "show_memory":
-                config.showMemory = value == "true"
+                config.showMemory = rawValue.lowercased() == "true"
             case "show_gpu":
-                config.showGPU = value == "true"
+                config.showGPU = rawValue.lowercased() == "true"
             case "show_network":
-                config.showNetwork = value == "true"
+                config.showNetwork = rawValue.lowercased() == "true"
+            case "cpu_icon":
+                if !rawValue.isEmpty { config.cpuIcon = rawValue }
+            case "memory_icon":
+                if !rawValue.isEmpty { config.memoryIcon = rawValue }
+            case "gpu_icon":
+                if !rawValue.isEmpty { config.gpuIcon = rawValue }
+            case "network_icon":
+                if !rawValue.isEmpty { config.networkIcon = rawValue }
             default:
                 break
             }
@@ -76,6 +92,13 @@ struct AppConfig {
         # Intervals: seconds between polls per monitor (min 0.5, gpu min 1.0)
         # GPU uses IOKit which is heavier — default 6s is recommended.
         # show_*: toggle each monitor on/off
+        #
+        # Icons: SF Symbol names — browse at developer.apple.com/sf-symbols
+        # Some options:
+        #   cpu:        cpu, cpu.fill, bolt, bolt.fill
+        #   memory:     memorychip, memorychip.fill
+        #   gpu:        display, display.fill, rectangle.3.group
+        #   network:    network, wifi, antenna.radiowaves.left.and.right
 
         cpu_interval: 2.0      # default: 2s
         memory_interval: 2.0   # default: 2s
@@ -86,6 +109,11 @@ struct AppConfig {
         show_memory: true
         show_gpu: true
         show_network: true
+
+        cpu_icon: cpu
+        memory_icon: memorychip
+        gpu_icon: display
+        network_icon: network
         """
 
         try? defaultYAML.write(to: configPath, atomically: true, encoding: .utf8)

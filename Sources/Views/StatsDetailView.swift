@@ -1,71 +1,136 @@
 import AppKit
+import IOKit
 
-/// Builds an NSView showing detailed stats. Created lazily on menu click.
-final class StatsDetailView: NSView {
-    private let stack = NSStackView()
+/// Builds and live-updates menu items showing detailed stats with SF Symbol icons.
+final class StatsMenuBuilder {
+    private var cpuItem: NSMenuItem?
+    private var memoryItem: NSMenuItem?
+    private var gpuItem: NSMenuItem?
+    private var downItem: NSMenuItem?
+    private var upItem: NSMenuItem?
 
-    init(snapshot: StatsSnapshot) {
-        super.init(frame: NSRect(x: 0, y: 0, width: 260, height: 0))
+    private let config: AppConfig
+    private let cpuLabel: String   // e.g. "CPU (10)"
+    private let gpuLabel: String   // e.g. "GPU (1)"
 
-        stack.orientation = .vertical
-        stack.alignment = .leading
-        stack.spacing = 6
-        stack.edgeInsets = NSEdgeInsets(top: 10, left: 12, bottom: 10, right: 12)
+    init(config: AppConfig) {
+        self.config = config
 
-        addHeader("OSX Stats Nano")
-        addSeparator()
-        addRow("CPU", String(format: "%.1f%%", snapshot.cpu))
-        addRow("Memory", String(format: "%.1f / %.1f GB (%.0f%%)",
-               snapshot.memory.usedGB, snapshot.memory.totalGB, snapshot.memory.percentage))
-        addRow("GPU", snapshot.gpu >= 0 ? String(format: "%.1f%%", snapshot.gpu) : "N/A")
-        addSeparator()
-        addRow("↓ Down", snapshot.network.formattedIn)
-        addRow("↑ Up", snapshot.network.formattedOut)
+        let coreCount = ProcessInfo.processInfo.processorCount
+        cpuLabel = "CPU (\(coreCount))"
 
-        addSubview(stack)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: topAnchor),
-            stack.leadingAnchor.constraint(equalTo: leadingAnchor),
-            stack.trailingAnchor.constraint(equalTo: trailingAnchor),
-            stack.bottomAnchor.constraint(equalTo: bottomAnchor),
-            stack.widthAnchor.constraint(equalToConstant: 260),
-        ])
+        let gpuCount = StatsMenuBuilder.gpuCount()
+        gpuLabel = gpuCount > 0 ? "GPU (\(gpuCount))" : "GPU"
     }
 
-    required init?(coder: NSCoder) { fatalError() }
+    func buildMenu(_ menu: NSMenu) {
+        menu.removeAllItems()
 
-    private func addHeader(_ text: String) {
-        let label = NSTextField(labelWithString: text)
-        label.font = .boldSystemFont(ofSize: 13)
-        stack.addArrangedSubview(label)
+        let headerItem = NSMenuItem(title: "OSX Stats Nano", action: nil, keyEquivalent: "")
+        headerItem.isEnabled = true
+        headerItem.attributedTitle = NSAttributedString(
+            string: "OSX Stats Nano",
+            attributes: [
+                .font: NSFont.boldSystemFont(ofSize: 13),
+                .foregroundColor: NSColor.labelColor,
+            ]
+        )
+        menu.addItem(headerItem)
+        menu.addItem(NSMenuItem.separator())
+
+        if config.showCPU {
+            cpuItem = makeRow(icon: config.cpuIcon, label: cpuLabel, value: "—")
+            menu.addItem(cpuItem!)
+        }
+        if config.showMemory {
+            memoryItem = makeRow(icon: config.memoryIcon, label: "Memory", value: "—")
+            menu.addItem(memoryItem!)
+        }
+        if config.showGPU {
+            gpuItem = makeRow(icon: config.gpuIcon, label: gpuLabel, value: "—")
+            menu.addItem(gpuItem!)
+        }
+        if config.showNetwork {
+            menu.addItem(NSMenuItem.separator())
+            downItem = makeRow(icon: config.networkIcon, label: "Down", value: "—")
+            menu.addItem(downItem!)
+            upItem = makeRow(icon: config.networkIcon, label: "Up", value: "—")
+            menu.addItem(upItem!)
+        }
+
+        menu.addItem(NSMenuItem.separator())
     }
 
-    private func addSeparator() {
-        let sep = NSBox()
-        sep.boxType = .separator
-        stack.addArrangedSubview(sep)
-        sep.widthAnchor.constraint(equalTo: stack.widthAnchor, constant: -24).isActive = true
+    func update(snapshot: StatsSnapshot) {
+        updateItem(cpuItem, label: cpuLabel, value: String(format: "%.1f%%", snapshot.cpu))
+        updateItem(memoryItem, label: "Memory",
+                   value: String(format: "%.1f / %.1f GB (%.0f%%)",
+                                 snapshot.memory.usedGB, snapshot.memory.totalGB, snapshot.memory.percentage))
+        updateItem(gpuItem, label: gpuLabel,
+                   value: snapshot.gpu >= 0 ? String(format: "%.1f%%", snapshot.gpu) : "N/A")
+        updateItem(downItem, label: "Down", value: snapshot.network.formattedIn)
+        updateItem(upItem, label: "Up", value: snapshot.network.formattedOut)
     }
 
-    private func addRow(_ label: String, _ value: String) {
-        let row = NSStackView()
-        row.orientation = .horizontal
-        row.distribution = .fill
+    private func makeRow(icon symbolName: String, label: String, value: String) -> NSMenuItem {
+        let item = NSMenuItem(title: label, action: nil, keyEquivalent: "")
+        item.isEnabled = true
 
-        let lbl = NSTextField(labelWithString: label)
-        lbl.font = .systemFont(ofSize: 12, weight: .medium)
+        if let img = NSImage(systemSymbolName: symbolName, accessibilityDescription: label) {
+            let symConfig = NSImage.SymbolConfiguration(pointSize: 13, weight: .medium)
+            item.image = img.withSymbolConfiguration(symConfig)
+        }
 
-        let val = NSTextField(labelWithString: value)
-        val.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
-        val.alignment = .right
+        updateItem(item, label: label, value: value)
+        return item
+    }
 
-        row.addArrangedSubview(lbl)
-        row.addArrangedSubview(val)
-        val.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        lbl.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+    private func updateItem(_ item: NSMenuItem?, label: String, value: String) {
+        guard let item else { return }
+        let attrStr = NSMutableAttributedString()
+        attrStr.append(NSAttributedString(
+            string: "\(label)    ",
+            attributes: [
+                .font: NSFont.systemFont(ofSize: 13, weight: .medium),
+                .foregroundColor: NSColor.labelColor,
+            ]
+        ))
+        attrStr.append(NSAttributedString(
+            string: value,
+            attributes: [
+                .font: NSFont.monospacedSystemFont(ofSize: 13, weight: .regular),
+                .foregroundColor: NSColor.labelColor,
+            ]
+        ))
+        item.attributedTitle = attrStr
+    }
 
-        stack.addArrangedSubview(row)
-        row.widthAnchor.constraint(equalTo: stack.widthAnchor, constant: -24).isActive = true
+    // Returns GPU core count from IOKit registry (Apple Silicon: e.g. 32 for M1 Max).
+    // Falls back to 0 if unavailable.
+    private static func gpuCount() -> Int {
+        let matching = IOServiceMatching("IOAccelerator")
+        var iterator: io_iterator_t = 0
+        guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iterator) == KERN_SUCCESS else {
+            return 0
+        }
+        defer { IOObjectRelease(iterator) }
+
+        var entry: io_object_t = IOIteratorNext(iterator)
+        while entry != 0 {
+            defer {
+                IOObjectRelease(entry)
+                entry = IOIteratorNext(iterator)
+            }
+            // Search entry and its parents for "gpu-core-count" (Apple Silicon)
+            if let n = IORegistryEntrySearchCFProperty(
+                entry, kIOServicePlane,
+                "gpu-core-count" as CFString,
+                kCFAllocatorDefault,
+                IOOptionBits(kIORegistryIterateParents | kIORegistryIterateRecursively)
+            ) as? NSNumber {
+                return n.intValue
+            }
+        }
+        return 0
     }
 }

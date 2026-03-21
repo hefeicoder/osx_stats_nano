@@ -17,15 +17,15 @@ struct PercentageBarWidget: StatusBarWidget {
         guard let ctx = NSGraphicsContext.current?.cgContext else { return }
         var x = origin.x
 
-        if let icon = icon {
-            let iconRect = NSRect(x: x, y: origin.y + (height - iconSize) / 2, width: iconSize, height: iconSize)
-            icon.draw(in: iconRect)
+        if let icon {
+            drawTemplateIcon(icon, in: NSRect(x: x, y: origin.y + (height - iconSize) / 2,
+                                              width: iconSize, height: iconSize), ctx: ctx)
             x += iconSize + gap
         }
 
         let barY = origin.y + (height - barHeight) / 2
 
-        ctx.setFillColor(NSColor.systemGray.withAlphaComponent(0.3).cgColor)
+        ctx.setFillColor(NSColor.labelColor.withAlphaComponent(0.2).cgColor)
         let bgPath = CGPath(roundedRect: CGRect(x: x, y: barY, width: barWidth, height: barHeight),
                             cornerWidth: 2, cornerHeight: 2, transform: nil)
         ctx.addPath(bgPath)

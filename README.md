@@ -56,27 +56,52 @@ Requires **macOS 13+** and **Xcode**.
 
 ## Configuration
 
-On first launch, a config file is created at:
-
-```
-~/.config/osx-stats-nano/config.yaml
-```
+On first launch, a config file is created at `~/.config/osx-stats-nano/config.yaml`. Edit and restart the app to apply changes.
 
 ```yaml
-# Intervals: seconds between polls per monitor
-cpu_interval: 2.0      # default: 2s
-memory_interval: 2.0   # default: 2s
-gpu_interval: 6.0      # default: 6s (IOKit is heavier)
-network_interval: 2.0  # default: 2s
+# ── Polling intervals (seconds) ─────────────────
+# Minimum: 0.5s (gpu minimum: 1.0s)
+# GPU uses IOKit which is heavier — 6s recommended.
 
-# Toggle monitors on/off
-show_cpu: true
-show_memory: true
-show_gpu: true
-show_network: true
+cpu_interval: 2.0      # default: 2.0
+memory_interval: 2.0   # default: 2.0
+gpu_interval: 6.0      # default: 6.0
+network_interval: 2.0  # default: 2.0
+
+# ── Visibility ───────────────────────────────────
+# Options: true | false
+
+show_cpu: true         # default: true
+show_memory: true      # default: true
+show_gpu: true         # default: true
+show_network: true     # default: true
+
+# ── Widget style ─────────────────────────────────
+# Options: circle | bar | vbar
+
+cpu_style: circle      # default: circle
+memory_style: circle   # default: circle
+gpu_style: circle      # default: circle
+
+# ── Widget color ─────────────────────────────────
+# Options: green | orange | blue | red | purple | yellow | pink | teal
+
+cpu_color: green       # default: green
+memory_color: orange   # default: orange
+gpu_color: purple      # default: purple
+
+# ── Icons (SF Symbol names) ──────────────────────
+# Browse at: developer.apple.com/sf-symbols
+# cpu:     cpu | cpu.fill | bolt | bolt.fill
+# memory:  memorychip | memorychip.fill
+# gpu:     display | display.fill | rectangle.3.group
+# network: network | wifi | antenna.radiowaves.left.and.right
+
+cpu_icon: cpu
+memory_icon: memorychip
+gpu_icon: display
+network_icon: network
 ```
-
-Edit the file and restart the app to apply changes.
 
 ## Architecture
 
@@ -108,10 +133,12 @@ Sources/
 │   ├── GPUMonitor.swift          # IOKit IOAccelerator
 │   └── NetworkMonitor.swift      # BSD getifaddrs
 ├── Widgets/
-│   ├── StatusBarWidget.swift     # Protocol
-│   ├── PercentageBarWidget.swift # Horizontal bar
+│   ├── StatusBarWidget.swift        # Protocol
+│   ├── PercentageBarWidget.swift    # Horizontal bar
 │   ├── PercentageCircleWidget.swift # Ring gauge
-│   └── TextWidget.swift          # Plain text
+│   ├── VerticalBarWidget.swift      # Vertical bar
+│   ├── NetworkWidget.swift          # Stacked ↓/↑ network
+│   └── TextWidget.swift             # Plain text
 └── Views/
     └── StatsDetailView.swift     # Dropdown detail panel
 ```

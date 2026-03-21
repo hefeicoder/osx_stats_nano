@@ -35,7 +35,7 @@ final class StatusBarView: NSView {
     var snapshot: StatsSnapshot = .empty
     private let appConfig: AppConfig
 
-    private let spacing: CGFloat = 4
+    private let spacing: CGFloat = 8
 
     // SF Symbol icons — cached once at init, never reallocated
     private let cpuIcon: NSImage?
@@ -49,11 +49,11 @@ final class StatusBarView: NSView {
     init(config: AppConfig = AppConfig()) {
         self.appConfig = config
         let symbolConfig = NSImage.SymbolConfiguration(pointSize: 10, weight: .medium)
-        cpuIcon = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)?
+        cpuIcon = NSImage(systemSymbolName: config.cpuIcon, accessibilityDescription: nil)?
             .withSymbolConfiguration(symbolConfig)
-        memIcon = NSImage(systemSymbolName: "memorychip", accessibilityDescription: nil)?
+        memIcon = NSImage(systemSymbolName: config.memoryIcon, accessibilityDescription: nil)?
             .withSymbolConfiguration(symbolConfig)
-        gpuIcon = NSImage(systemSymbolName: "gpu", accessibilityDescription: nil)?
+        gpuIcon = NSImage(systemSymbolName: config.gpuIcon, accessibilityDescription: nil)?
             .withSymbolConfiguration(symbolConfig)
         super.init(frame: .zero)
     }
@@ -63,17 +63,20 @@ final class StatusBarView: NSView {
     /// Rebuild widget list and cache width. Called once per snapshot update, NOT per draw.
     func rebuildWidgets() {
         var widgets: [StatusBarWidget] = []
+        if appConfig.showNetwork {
+            widgets.append(TextWidget(
+                "↓\(snapshot.network.formattedIn) ↑\(snapshot.network.formattedOut)",
+                sizedFor: "↓999 MB/s ↑999 MB/s"
+            ))
+        }
         if appConfig.showCPU {
-            widgets.append(PercentageBarWidget(icon: cpuIcon, percentage: snapshot.cpu, tintColor: .systemGreen))
+            widgets.append(PercentageCircleWidget(icon: cpuIcon, percentage: snapshot.cpu, tintColor: .systemGreen))
         }
         if appConfig.showMemory {
             widgets.append(PercentageCircleWidget(icon: memIcon, percentage: snapshot.memory.percentage, tintColor: .systemOrange))
         }
         if appConfig.showGPU && snapshot.gpu >= 0 {
             widgets.append(PercentageCircleWidget(icon: gpuIcon, percentage: snapshot.gpu, tintColor: .systemPurple))
-        }
-        if appConfig.showNetwork {
-            widgets.append(TextWidget("↓\(snapshot.network.formattedIn) ↑\(snapshot.network.formattedOut)"))
         }
         cachedWidgets = widgets
         cachedWidth = widgets.isEmpty ? 0 : widgets.reduce(0) { $0 + $1.widthForHeight(22) + spacing } - spacing

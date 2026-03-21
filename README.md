@@ -1,5 +1,7 @@
 # OSX Stats Nano
 
+<img src="icon.png" width="128">
+
 The world's lightest macOS menu bar system monitor. Pure AppKit, zero dependencies, ~800 lines of Swift.
 
 ![macOS 13+](https://img.shields.io/badge/macOS-13%2B-blue)

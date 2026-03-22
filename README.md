@@ -24,13 +24,13 @@ Click the menu bar item for a detailed breakdown with core counts and live-updat
 
 ## Why another stats app?
 
-Most menu bar monitors pull in SwiftUI, Combine, or third-party charting libraries. OSX Stats Nano uses **none of that**:
+Most menu bar monitors are bloated — SwiftUI, Combine, third-party charting libraries, 30–100 MB of RAM just to show you a number. OSX Stats Nano is built on one principle: **the monitor should never be the thing slowing you down.**
 
-- **Pure AppKit** — no SwiftUI, no dependencies beyond Apple system frameworks
-- **Zero-alloc draw path** — widgets draw directly to `CGContext`, SF Symbol icons cached at init
-- **Change detection** — skips display updates when your system is idle
-- **Per-monitor polling** — each metric has its own configurable interval
-- **180 KB binary, ~1,100 lines of Swift** — easy to audit, easy to trust
+- **Pure AppKit, zero dependencies** — no SwiftUI, no Combine, nothing beyond Apple system frameworks
+- **Zero-alloc draw path** — widgets draw directly to `CGContext`; SF Symbol icons cached at init, not every frame
+- **Change detection** — skips all redraws when your system is idle; silent when nothing changes
+- **Per-monitor polling** — each metric polls on its own interval; GPU can be slow, network can be fast
+- **180 KB binary, ~1,100 lines of Swift** — small enough to read in an afternoon, easy to audit, easy to trust
 
 ## Install
 

@@ -22,6 +22,11 @@ Displays live **CPU**, **Memory**, **GPU**, and **Network** stats in your menu b
 
 Click the menu bar item for a detailed breakdown with core counts and live-updating values.
 
+## Feedback
+
+- **Bug reports** → [GitHub Issues](https://github.com/hefeicoder/osx_stats_nano/issues)
+- **Ideas & feature requests** → [GitHub Discussions](https://github.com/hefeicoder/osx_stats_nano/discussions)
+
 ## Why another stats app?
 
 Most menu bar monitors are bloated — SwiftUI, Combine, third-party charting libraries, 30–100 MB of RAM just to show you a number. OSX Stats Nano is built on one principle: **the monitor should never be the thing slowing you down.**

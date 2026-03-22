@@ -2,7 +2,7 @@
 
 # OSX Stats Nano
 
-The world's lightest macOS menu bar system monitor. Pure AppKit, zero dependencies, ~800 lines of Swift.
+An ultra-light macOS menu bar system monitor. Pure AppKit, zero dependencies, 180 KB binary, ~1,100 lines of Swift.
 
 ![macOS 13+](https://img.shields.io/badge/macOS-13%2B-blue)
 ![Swift 5.9](https://img.shields.io/badge/Swift-5.9-orange)
@@ -30,7 +30,7 @@ Most menu bar monitors pull in SwiftUI, Combine, or third-party charting librari
 - **Zero-alloc draw path** — widgets draw directly to `CGContext`, SF Symbol icons cached at init
 - **Change detection** — skips display updates when your system is idle
 - **Per-monitor polling** — each metric has its own configurable interval
-- **~10 MB RSS** target (vs 15–20 MB for SwiftUI-based alternatives)
+- **180 KB binary, ~1,100 lines of Swift** — easy to audit, easy to trust
 
 ## Install
 

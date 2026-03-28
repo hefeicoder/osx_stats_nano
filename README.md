@@ -43,11 +43,14 @@ Most menu bar monitors are bloated — SwiftUI, Combine, third-party charting li
 
 1. Download `OSXStatsNano-x.x.x.dmg` from [Releases](https://github.com/hefeicoder/osx_stats_nano/releases/latest)
 2. Open the DMG and drag **OSXStatsNano** into Applications
-3. **First launch:** macOS will block the app since it is not notarized. To open it:
-   - Run in Terminal: `xattr -d com.apple.quarantine /Applications/OSXStatsNano.app`, or
-   - Go to **System Settings → Privacy & Security**, scroll down to find _"OSXStatsNano was blocked"_, and click **Open Anyway**
+3. Open the app
 
-   > **Note:** On macOS Ventura+, double-clicking shows a "Move to Trash / Done" dialog with no Open option — dismiss it with **Done**, then follow the Privacy & Security steps above.
+> [!WARNING]
+> **First launch:** macOS will block the app since it is not notarized. To open it:
+> - Run in Terminal: `xattr -d com.apple.quarantine /Applications/OSXStatsNano.app`, or
+> - Go to **System Settings → Privacy & Security**, scroll down to find _"OSXStatsNano was blocked"_, and click **Open Anyway**
+>
+> On macOS Ventura+, double-clicking shows a "Move to Trash / Done" dialog with no Open option — dismiss it with **Done**, then follow the Privacy & Security steps above.
 
 **Build from source:**
 

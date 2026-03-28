@@ -39,10 +39,26 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
         }
         poller.start()
+
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self,
+            selector: #selector(systemDidWake),
+            name: NSWorkspace.didWakeNotification,
+            object: nil
+        )
     }
 
     func applicationWillTerminate(_ notification: Notification) {
         poller.stop()
+    }
+
+    @objc private func systemDidWake() {
+        // NSStatusItem can become invalid after long sleep — recreate it
+        statusBarController = StatusBarController(config: config)
+        statusBarController.setMenu(menu)
+        // Restart poller to reset elapsed timers and get fresh readings immediately
+        poller.stop()
+        poller.start()
     }
 
     // MARK: - NSMenuDelegate

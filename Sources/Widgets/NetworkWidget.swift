@@ -7,6 +7,7 @@ struct NetworkWidget: StatusBarWidget {
     let upText: String
 
     private let font = NSFont.monospacedSystemFont(ofSize: 9, weight: .regular)
+    private let arrowFont = NSFont.monospacedSystemFont(ofSize: 9, weight: .medium)
     private let dotSize: CGFloat = 5
     private let dotGap: CGFloat = 3
     private let rowGap: CGFloat = 1
@@ -17,9 +18,9 @@ struct NetworkWidget: StatusBarWidget {
     init(down: String, up: String) {
         self.downText = down
         self.upText = up
-        let attrs: [NSAttributedString.Key: Any] = [.font: NSFont.monospacedSystemFont(ofSize: 9, weight: .regular)]
-        let arrowAttrs: [NSAttributedString.Key: Any] = [.font: NSFont.monospacedSystemFont(ofSize: 9, weight: .medium)]
-        let arrowWidth = ceil(("↓" as NSString).size(withAttributes: arrowAttrs).width)
+        let attrs: [NSAttributedString.Key: Any] = [.font: font]
+        let arrowAttrsInit: [NSAttributedString.Key: Any] = [.font: arrowFont]
+        let arrowWidth = ceil(("↓" as NSString).size(withAttributes: arrowAttrsInit).width)
         let textWidth = ceil((Self.maxTemplate as NSString).size(withAttributes: attrs).width)
         self.fixedWidth = arrowWidth + 3 + textWidth // arrow + gap + text
     }
@@ -39,7 +40,7 @@ struct NetworkWidget: StatusBarWidget {
         let botY = topY - textHeight - rowGap                             // bottom row baseline
 
         let arrowAttrs: [NSAttributedString.Key: Any] = [
-            .font: NSFont.monospacedSystemFont(ofSize: 9, weight: .medium),
+            .font: arrowFont,
             .foregroundColor: NSColor.labelColor,
         ]
         let arrowWidth = ceil(("↓" as NSString).size(withAttributes: arrowAttrs).width)

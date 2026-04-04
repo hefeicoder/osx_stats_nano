@@ -5,6 +5,8 @@ final class CPUMonitor {
     private let hostPort = mach_host_self()
     private var previousTicks: (user: UInt64, system: UInt64, idle: UInt64, nice: UInt64)?
 
+    func reset() { previousTicks = nil }
+
     /// Returns CPU usage as percentage (0.0–100.0).
     /// First call returns 0 (establishes baseline). Subsequent calls return delta-based usage.
     func currentUsage() -> Double {

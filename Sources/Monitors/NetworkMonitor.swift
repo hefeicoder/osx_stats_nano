@@ -25,6 +25,11 @@ final class NetworkMonitor {
     private var previousBytes: (inBytes: UInt64, outBytes: UInt64)?
     private var previousTime: CFAbsoluteTime?
 
+    func reset() {
+        previousBytes = nil
+        previousTime = nil
+    }
+
     func currentThroughput() -> NetworkThroughput {
         let current = readTotalBytes()
         let now = CFAbsoluteTimeGetCurrent()

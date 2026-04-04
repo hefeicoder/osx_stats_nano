@@ -20,9 +20,9 @@ struct StatsSnapshot {
         if abs(memory.percentage - other.memory.percentage) >= 1.0 { return true }
         if abs(gpu - other.gpu) >= 1.0 { return true }
         // 1 KB/s threshold — prevents jitter from defeating idle suppression
-        let inDelta = network.bytesInPerSec.distance(to: other.network.bytesInPerSec)
-        let outDelta = network.bytesOutPerSec.distance(to: other.network.bytesOutPerSec)
-        if abs(inDelta) > 1024 || abs(outDelta) > 1024 { return true }
+        let inDelta = max(network.bytesInPerSec, other.network.bytesInPerSec) - min(network.bytesInPerSec, other.network.bytesInPerSec)
+        let outDelta = max(network.bytesOutPerSec, other.network.bytesOutPerSec) - min(network.bytesOutPerSec, other.network.bytesOutPerSec)
+        if inDelta > 1024 || outDelta > 1024 { return true }
         return false
     }
 }

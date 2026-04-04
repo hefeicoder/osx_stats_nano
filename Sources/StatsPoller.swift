@@ -44,6 +44,8 @@ final class StatsPoller {
 
     func start() {
         stop()
+        cpuMonitor.reset()
+        networkMonitor.reset()
         // Fire immediately on first tick
         cpuElapsed = cpuInterval
         memoryElapsed = memoryInterval

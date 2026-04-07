@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased]
+## [1.0.10] - 2026-04-06
 
-### Fix: remove unnecessary StatusBarController recreation on wake (v1.0.10)
+### Fix: remove unnecessary StatusBarController recreation on wake
 
 **Symptom observed (Apr 6 2026):**
 After connecting an external monitor and rearranging displays, the system log showed

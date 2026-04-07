@@ -53,10 +53,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     @objc private func systemDidWake() {
-        // NSStatusItem can become invalid after long sleep — recreate it
-        statusBarController = StatusBarController(config: config)
-        statusBarController.setMenu(menu)
-        // Restart poller to reset elapsed timers and get fresh readings immediately
+        // Restart poller to reset elapsed timers and clear stale monitor state.
+        // NSStatusItem is managed by ControlCenter and survives sleep/wake on modern macOS —
+        // recreating it caused BSBlockSentinel/FBSWorkspaceScenesClient failures on every wake.
         poller.stop()
         poller.start()
     }

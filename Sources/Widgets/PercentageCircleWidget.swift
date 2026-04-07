@@ -55,12 +55,8 @@ func drawTemplateIcon(_ icon: NSImage, in rect: NSRect, ctx: CGContext) {
         return
     }
     ctx.saveGState()
-    // CGImage origin is bottom-left; flip vertically to match AppKit
-    ctx.translateBy(x: rect.minX, y: rect.maxY)
-    ctx.scaleBy(x: 1, y: -1)
-    let r = CGRect(origin: .zero, size: rect.size)
-    ctx.clip(to: r, mask: cgImage)
+    ctx.clip(to: rect, mask: cgImage)
     NSColor.labelColor.setFill()
-    ctx.fill(r)
+    ctx.fill(rect)
     ctx.restoreGState()
 }

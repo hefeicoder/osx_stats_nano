@@ -38,6 +38,7 @@ struct AppConfig {
         case "yellow": return .systemYellow
         case "pink":   return .systemPink
         case "teal":   return .systemTeal
+        case "auto":   return .labelColor
         default:       return .systemGreen
         }
     }
@@ -153,7 +154,7 @@ struct AppConfig {
         gpu_style: circle      # default: circle
 
         # ── Widget color ─────────────────────────
-        # Options: green | orange | blue | red | purple | yellow | pink | teal
+        # Options: auto | green | orange | blue | red | purple | yellow | pink | teal
 
         cpu_color: green       # default: green
         memory_color: orange   # default: orange
